@@ -1,0 +1,9 @@
+button	KEYWORD1
+read	KEYWORD2
+isPressed	KEYWORD2
+isReleased	KEYWORD2
+wasPressed	KEYWORD2
+wasReleased	KEYWORD2
+pressedFor	KEYWORD2
+releasedFor	KEYWORD2
+lastChange	KEYWORD2
