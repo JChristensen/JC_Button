@@ -1,8 +1,6 @@
 /*----------------------------------------------------------------------*
- * button.h -- Library for reading momentary contact switches like      *
- * tactile button switches.                                             *
- *                                                                      *
- * Jack Christensen 11 May 2011                                         *
+ * Arduino Button Library v1.0                                          *
+ * Jack Christensen Mar 2012                                            *
  *                                                                      *
  * This work is licensed under the Creative Commons Attribution-        *
  * ShareAlike 3.0 Unported License. To view a copy of this license,     *

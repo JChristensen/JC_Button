@@ -1,6 +1,6 @@
 /*----------------------------------------------------------------------*
  * Arduino Button Library v1.0                                          *
- * Jack Christensen Mar 2012                                            *
+ * Jack Christensen May 2011, published Mar 2012                        *
  *                                                                      *
  * Library for reading momentary contact switches like tactile button   *
  * switches. Intended for use in state machine constructs.              *
