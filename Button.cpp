@@ -59,7 +59,7 @@ uint8_t Button::read(void)
     ms = millis();
     pinVal = digitalRead(_pin);
     if (_invert != 0) pinVal = !pinVal;
-    if (ms < _lastChange + _dbTime) {
+    if (ms - _lastChange < _dbTime) {
         _lastTime = _time;
         _time = ms;
         _changed = 0;
