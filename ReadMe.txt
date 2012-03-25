@@ -8,9 +8,10 @@ http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to Creative
 Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
 
 --------------------------------------------------------------------------------
-Work in progress.
-Please check back later for more complete documentation.
+Documentation is a work in progress.
+Please check back around mid-April.
 Thanks! ... jc
+25Mar2012
 
 --------------------------------------------------------------------------------
 To use the library:
