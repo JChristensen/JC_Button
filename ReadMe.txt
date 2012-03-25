@@ -9,5 +9,16 @@ Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.
 
 --------------------------------------------------------------------------------
 Work in progress.
-Please check back later.
+Please check back later for more complete documentation.
 Thanks! ... jc
+
+--------------------------------------------------------------------------------
+To use the library:
+(1) Go to https://github.com/JChristensen/Button/downloads and download the
+file in the compressed format of your choice (zip or tar.gz) to a convenient
+location on your PC.
+(2) Uncompress the downloaded file. This will result in a folder containing all
+the files for the library, that has a name similar to "JChristensen-
+Button-42e98a7".
+(3) Rename the folder to just "Button".
+(4) Copy the renamed folder to the Arduino sketchbook\libraries folder.
