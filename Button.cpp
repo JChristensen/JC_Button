@@ -43,7 +43,6 @@ Button::Button(uint8_t pin, uint8_t puEnable, uint8_t invert, uint32_t dbTime)
     _time = millis();
     _lastState = _state;
     _changed = 0;
-    _lastTime = _time;
     _lastChange = _time;
 }
 
@@ -60,13 +59,11 @@ uint8_t Button::read(void)
     pinVal = digitalRead(_pin);
     if (_invert != 0) pinVal = !pinVal;
     if (ms - _lastChange < _dbTime) {
-        _lastTime = _time;
         _time = ms;
         _changed = 0;
         return _state;
     }
     else {
-        _lastTime = _time;
         _lastState = _state;
         _state = pinVal;
         _time = ms;
