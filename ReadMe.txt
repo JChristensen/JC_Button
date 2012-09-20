@@ -96,7 +96,7 @@ milliseconds.  Returns false or true accordingly.  These functions are useful to
 detect "long presses".  Note that these functions DO NOT cause the button to be
 read.
 
-Example:    if (myButton.pressedFor(1000) {     //has button been pressed
+Example:    if ( myButton.pressedFor(1000) ) {  //has button been pressed
                                                 //for one second?
 
 --------------------------------------------------------------------------------
