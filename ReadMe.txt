@@ -25,7 +25,7 @@ Button-42e98a7".
 (4) Copy the renamed folder to the Arduino sketchbook\libraries folder.
 
 --------------------------------------------------------------------------------
-The following example sketches are included with the Timezone library:
+The following example sketches are included with the Button library:
 
 SimpleOnOff: Just turns the Arduino's pin 13 LED on and off.
 
