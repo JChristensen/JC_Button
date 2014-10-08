@@ -1,0 +1,10 @@
+{
+  "name": "Arduino-Button",
+  "keywords": "button, switch, press",
+  "description": "Arduino library to debounce button switches, detect presses, releases, and long presses",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/JChristensen/Button.git"
+  }
+}
