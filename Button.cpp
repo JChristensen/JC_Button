@@ -35,9 +35,10 @@ Button::Button(uint8_t pin, uint8_t puEnable, uint8_t invert, uint32_t dbTime)
     _puEnable = puEnable;
     _invert = invert;
     _dbTime = dbTime;
-    pinMode(_pin, INPUT);
     if (_puEnable != 0)
-        digitalWrite(_pin, HIGH);       //enable pullup resistor
+        pinMode(_pin, INPUT_PULLUP);    //enable pullup resistor
+    else
+        pinMode(_pin, INPUT);
     _state = digitalRead(_pin);
     if (_invert != 0) _state = !_state;
     _time = millis();
