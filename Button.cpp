@@ -69,6 +69,7 @@ uint8_t Button::read(void)
         _state = pinVal;
         _time = ms;
         if (_state != _lastState)   {
+            _changeDuration = ms - _lastChange;
             _lastChange = ms;
             _changed = 1;
         }
@@ -124,6 +125,16 @@ uint8_t Button::pressedFor(uint32_t ms)
 uint8_t Button::releasedFor(uint32_t ms)
 {
     return (_state == 0 && _time - _lastChange >= ms) ? 1 : 0;
+}
+
+/*----------------------------------------------------------------------*
+ * wasPressedOrReleasedFor(ms) check to see how long the button was     *
+ * pressed (or released). Returns false (0) or true (1) accordingly.    *
+ * These functions do not cause the button to be read.                  *
+ *----------------------------------------------------------------------*/
+uint8_t Button::wasPressedOrReleasedFor(uint32_t ms)
+{
+    return ( _changeDuration >= ms) ? 1 : 0;
 }
 
 /*----------------------------------------------------------------------*
