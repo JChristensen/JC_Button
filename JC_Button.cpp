@@ -14,7 +14,7 @@
  * San Francisco, California, 94105, USA.                               *
  *----------------------------------------------------------------------*/
 
-#include "Button.h"
+#include "JC_Button.h"
 
 /*----------------------------------------------------------------------*
  * Button(pin, puEnable, invert, dbTime) instantiates a button object.  *
