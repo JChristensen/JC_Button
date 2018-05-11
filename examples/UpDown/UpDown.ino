@@ -3,7 +3,7 @@
 // Copyright (C) 2018 by Jack Christensen and licensed under
 // GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
 //
-// Example skletch that uses both short and long button presses to adjust
+// Example sketch that uses both short and long button presses to adjust
 // a number up and down, between two limits. Short presses increment
 // or decrement by one, long presses repeat at a specified rate.
 // Every time the number changes, it is written to the serial monitor.
@@ -43,13 +43,13 @@ void loop()
 
     btnUP.read();                   // read the buttons
     btnDN.read();
-    
+
     if (count != lastCount)         // print the count if it has changed
     {
         lastCount = count;
         Serial.println(count, DEC);
     }
-    
+
     switch (STATE)
     {
         case WAIT:                              // wait for a button event

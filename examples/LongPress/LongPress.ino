@@ -32,7 +32,7 @@ void setup()
 // sequence of states, i.e. ONOFF --> TO_BLINK --> BLINK --> TO_ONOFF --> ONOFF
 // note that while the user perceives two "modes", i.e. ON/OFF mode and rapid blink mode,
 // two extra states are needed in the state machine to transition between these modes.
-enum states_t {ONOFF, TO_BLINK, BLINK, TO_ONOFF};       
+enum states_t {ONOFF, TO_BLINK, BLINK, TO_ONOFF};
 
 bool ledState;                  // current LED status
 unsigned long ms;               // current time from millis()
@@ -43,18 +43,18 @@ void loop()
     static states_t STATE;      // current state machine state
     ms = millis();              // record the current time
     myBtn.read();               // read the button
-    
+
     switch (STATE)
     {
         // this state watches for short and long presses, switches the LED for
         // short presses, and moves to the TO_BLINK state for long presses.
-        case ONOFF:                
+        case ONOFF:
             if (myBtn.wasReleased())
                 switchLED();
             else if (myBtn.pressedFor(LONG_PRESS))
                 STATE = TO_BLINK;
             break;
-            
+
         // this is a transition state where we start the fast blink as feedback to the user,
         // but we also need to wait for the user to release the button, i.e. end the
         // long press, before moving to the BLINK state.
@@ -64,7 +64,7 @@ void loop()
             else
                 fastBlink();
             break;
-            
+
         // the fast-blink state. Watch for another long press which will cause us to
         // turn the LED off (as feedback to the user) and move to the TO_ONOFF state.
         case BLINK:
@@ -77,7 +77,7 @@ void loop()
             else
                 fastBlink();
             break;
-            
+
         // this is a transition state where we just wait for the user to release the button
         // before moving back to the ONOFF state.
         case TO_ONOFF:
@@ -87,7 +87,7 @@ void loop()
     }
 }
 
-// reverse the current LED state. if it's on, turn it off. If it's off, turn it on.
+// reverse the current LED state. if it's on, turn it off. if it's off, turn it on.
 void switchLED()
 {
     msLast = ms;                // record the last switch time
@@ -95,7 +95,7 @@ void switchLED()
     digitalWrite(LED_PIN, ledState);
 }
 
-// switch the LED on and off every BLINK_INETERVAL milliseconds.
+// switch the LED on and off every BLINK_INTERVAL milliseconds.
 void fastBlink()
 {
     if (ms - msLast >= BLINK_INTERVAL)

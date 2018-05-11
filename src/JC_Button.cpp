@@ -2,28 +2,12 @@
 // https://github.com/JChristensen/JC_Button
 // Copyright (C) 2018 by Jack Christensen and licensed under
 // GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
-//
-// Library for reading momentary contact switches like tactile button
-// switches. Intended for use in state machine constructs.
-// Use the read() function to read each button in the main loop,
-// which should execute as fast as possible.
 
 #include "JC_Button.h"
 
 /*----------------------------------------------------------------------*
- * Button(pin, puEnable, invert, dbTime) instantiates a button object.  *
- * pin      Is the Arduino pin the button is connected to.              *
- * puEnable Enables the AVR internal pullup resistor if != 0 (can also  *
- *          use true or false).                                         *
- * invert   If invert == 0, interprets a high state as pressed, low as  *
- *          released. If invert != 0, interprets a high state as        *
- *          released, low as pressed  (can also use true or false).     *
- * dbTime   Is the debounce time in milliseconds.                       *
- *                                                                      *
- * (Note that invert cannot be implied from puEnable since an external  *
- *  pullup could be used.)                                              *
- *----------------------------------------------------------------------*/
-
+/ initialize a Button object and the pin it's connected to.             *
+/-----------------------------------------------------------------------*/
 void Button::begin()
 {
     pinMode(m_pin, m_puEnable ? INPUT_PULLUP : INPUT);
@@ -36,29 +20,27 @@ void Button::begin()
 }
 
 /*----------------------------------------------------------------------*
-/ returns the state of the button, true==pressed, false==released,      *
-/ does debouncing, captures and maintains times, previous states, etc.  *
+/ returns the state of the button, true if pressed, false if released.  *
+/ does debouncing, captures and maintains times, previous state, etc.   *
 /-----------------------------------------------------------------------*/
 bool Button::read()
 {
     uint32_t ms = millis();
-    uint8_t pinVal = digitalRead(m_pin);
+    bool pinVal = digitalRead(m_pin);
     if (m_invert) pinVal = !pinVal;
     if (ms - m_lastChange < m_dbTime)
     {
-        m_time = ms;
         m_changed = false;
-        return m_state;
     }
     else
     {
         m_lastState = m_state;
         m_state = pinVal;
-        m_time = ms;
         m_changed = (m_state != m_lastState);
         if (m_changed) m_lastChange = ms;
-        return m_state;
     }
+    m_time = ms;
+    return m_state;
 }
 
 /*----------------------------------------------------------------------*
@@ -73,7 +55,7 @@ bool Button::isPressed()
 
 bool Button::isReleased()
 {
-    return m_state;
+    return !m_state;
 }
 
 /*----------------------------------------------------------------------*
