@@ -1,85 +1,85 @@
-/*----------------------------------------------------------------------*
- * Example sketch for Arduino Button Library by Jack Christensen        *
- *                                                                      *
- * An example that uses both short and long button presses to adjust    *
- * a number up and down, between two limits. Short presses increment    *
- * or decrement by one, long presses repeat at a specified rate.        *
- * Every time the number changes, it is written to the serial monitor.  *
- *                                                                      *
- * This work is licensed under the Creative Commons Attribution-        *
- * ShareAlike 3.0 Unported License. To view a copy of this license,     *
- * visit http://creativecommons.org/licenses/by-sa/3.0/ or send a       *
- * letter to Creative Commons, 171 Second Street, Suite 300,            *
- * San Francisco, California, 94105, USA.                               *
- *----------------------------------------------------------------------*/
+// Arduino Button Library
+// https://github.com/JChristensen/JC_Button
+// Copyright (C) 2018 by Jack Christensen and licensed under
+// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+//
+// Example skletch that uses both short and long button presses to adjust
+// a number up and down, between two limits. Short presses increment
+// or decrement by one, long presses repeat at a specified rate.
+// Every time the number changes, it is written to the serial monitor.
 
-#include <JC_Button.h>     //https://github.com/JChristensen/JC_Button
+#include <JC_Button.h>              // https://github.com/JChristensen/JC_Button
 
-#define DN_PIN 7           //Connect two tactile button switches (or something similar)
-#define UP_PIN 8           //from Arduino pin 7 to ground and from pin 8 to ground.
-#define PULLUP true        //To keep things simple, we use the Arduino's internal pullup resistor.
-#define INVERT true        //Since the pullup resistor will keep the pin high unless the
-                           //switch is closed, this is negative logic, i.e. a high state
-                           //means the button is NOT pressed. (Assuming a normally open switch.)
-#define DEBOUNCE_MS 25     //A debounce time of 20 milliseconds usually works well for tactile button switches.
+// pin assignments
+const byte
+    DN_PIN(7),                      // connect a button switch from this pin to ground
+    UP_PIN(8);                      // ditto
 
-#define REPEAT_FIRST 500   //ms required before repeating on long press
-#define REPEAT_INCR 100    //repeat interval for long press
-#define MIN_COUNT 0
-#define MAX_COUNT 59
+Button btnUP(UP_PIN), btnDN(DN_PIN);    // define the buttons
 
-Button btnUP(UP_PIN, PULLUP, INVERT, DEBOUNCE_MS);    //Define the buttons
-Button btnDN(DN_PIN, PULLUP, INVERT, DEBOUNCE_MS);
-
-enum {WAIT, INCR, DECR};              //The possible states for the state machine
-uint8_t STATE;                        //The current state machine state
-int count;                            //The number that is adjusted
-int lastCount = -1;                   //Previous value of count (initialized to ensure it's different when the sketch starts)
-unsigned long rpt = REPEAT_FIRST;     //A variable time that is used to drive the repeats for long presses
+const unsigned long
+    REPEAT_FIRST(500),              // ms required before repeating on long press
+    REPEAT_INCR(100);               // repeat interval for long press
+const int
+    MIN_COUNT(0),
+    MAX_COUNT(59);
 
 void setup()
 {
+    btnUP.begin();
+    btnDN.begin();
     Serial.begin(115200);
 }
 
 void loop()
 {
-    btnUP.read();                             //read the buttons
+    static int
+        count,                          // the number that is adjusted
+        lastCount(-1);                  // previous value of count (initialized to ensure it's different when the sketch starts)
+    static unsigned long
+        rpt(REPEAT_FIRST);              // a variable time that is used to drive the repeats for long presses
+    enum states_t {WAIT, INCR, DECR};   // states for the state machine
+    static states_t STATE;              // current state machine state
+
+    btnUP.read();                   // read the buttons
     btnDN.read();
     
-    if (count != lastCount) {                 //print the count if it has changed
+    if (count != lastCount)         // print the count if it has changed
+    {
         lastCount = count;
         Serial.println(count, DEC);
     }
     
-    switch (STATE) {
-        
-        case WAIT:                                //wait for a button event
+    switch (STATE)
+    {
+        case WAIT:                              // wait for a button event
             if (btnUP.wasPressed())
                 STATE = INCR;
             else if (btnDN.wasPressed())
                 STATE = DECR;
-            else if (btnUP.wasReleased())         //reset the long press interval
+            else if (btnUP.wasReleased())       // reset the long press interval
                 rpt = REPEAT_FIRST;
             else if (btnDN.wasReleased())
                 rpt = REPEAT_FIRST;
-            else if (btnUP.pressedFor(rpt)) {     //check for long press
-                rpt += REPEAT_INCR;               //increment the long press interval
+            else if (btnUP.pressedFor(rpt))     // check for long press
+            {
+                rpt += REPEAT_INCR;             // increment the long press interval
                 STATE = INCR;
             }
-            else if (btnDN.pressedFor(rpt)) {
+            else if (btnDN.pressedFor(rpt))
+            {
                 rpt += REPEAT_INCR;
                 STATE = DECR;
             }
             break;
 
-        case INCR:                                //increment the counter
-            count = min(count++, MAX_COUNT);      //but not more than the specified maximum
+        case INCR:                              // increment the counter
+            count = min(count++, MAX_COUNT);    // but not more than the specified maximum
             STATE = WAIT;
             break;
 
-        case DECR:                                //decrement the counter
-            count = max(count--, MIN_COUNT);      //but not less than the specified minimum
+        case DECR:                              // decrement the counter
+            count = max(count--, MIN_COUNT);    // but not less than the specified minimum
             STATE = WAIT;
             break;
     }

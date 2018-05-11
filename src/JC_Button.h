@@ -1,42 +1,37 @@
-/*----------------------------------------------------------------------*
- * Arduino Button Library v1.0                                          *
- * Jack Christensen Mar 2012                                            *
- *                                                                      *
- * This work is licensed under the Creative Commons Attribution-        *
- * ShareAlike 3.0 Unported License. To view a copy of this license,     *
- * visit http://creativecommons.org/licenses/by-sa/3.0/ or send a       *
- * letter to Creative Commons, 171 Second Street, Suite 300,            *
- * San Francisco, California, 94105, USA.                               *
- *----------------------------------------------------------------------*/
-#ifndef Button_h
-#define Button_h
-#if ARDUINO >= 100
+// Arduino Button Library
+// https://github.com/JChristensen/JC_Button
+// Copyright (C) 2018 by Jack Christensen and licensed under
+// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+
+#ifndef JC_BUTTON_H_INCLUDED
+#define JC_BUTTON_H_INCLUDED
+
 #include <Arduino.h> 
-#else
-#include <WProgram.h> 
-#endif
+
 class Button
 {
     public:
-        Button(uint8_t pin, uint8_t puEnable, uint8_t invert, uint32_t dbTime);
-        uint8_t read();
-        uint8_t isPressed();
-        uint8_t isReleased();
-        uint8_t wasPressed();
-        uint8_t wasReleased();
-        uint8_t pressedFor(uint32_t ms);
-        uint8_t releasedFor(uint32_t ms);
+        Button::Button(uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
+            : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert) {}
+        void begin();
+        bool read();
+        bool isPressed();
+        bool isReleased();
+        bool wasPressed();
+        bool wasReleased();
+        bool pressedFor(uint32_t ms);
+        bool releasedFor(uint32_t ms);
         uint32_t lastChange();
     
     private:
-        uint8_t _pin;           //arduino pin number
-        uint8_t _puEnable;      //internal pullup resistor enabled
-        uint8_t _invert;        //if 0, interpret high state as pressed, else interpret low state as pressed
-        uint8_t _state;         //current button state
-        uint8_t _lastState;     //previous button state
-        uint8_t _changed;       //state changed since last read
-        uint32_t _time;         //time of current state (all times are in ms)
-        uint32_t _lastChange;   //time of last state change
-        uint32_t _dbTime;       //debounce time
+        uint8_t m_pin;          // arduino pin number connected to button
+        bool m_puEnable;        // internal pullup resistor enabled
+        bool m_invert;          // if true, interpret logic low as pressed, else interpret logic high as pressed
+        bool m_state;           // current button state, true=pressed
+        bool m_lastState;       // previous button state
+        bool m_changed;         // state changed since last read
+        uint32_t m_time;        // time of current state (ms from millis)
+        uint32_t m_lastChange;  // time of last state change (ms)
+        uint32_t m_dbTime;      // debounce time (ms)
 };
 #endif

@@ -1,43 +1,35 @@
-/*----------------------------------------------------------------------*
- * Example sketch for Arduino Button Library by Jack Christensen        *
- *                                                                      *
- * The simplest example. Using a tactile button switch to turn          *
- * the Arduino's pin 13 LED on and off. Wire a switch from Arduino      *
- * pin 2 to ground.                                                     *
- *                                                                      *
- * This work is licensed under the Creative Commons Attribution-        *
- * ShareAlike 3.0 Unported License. To view a copy of this license,     *
- * visit http://creativecommons.org/licenses/by-sa/3.0/ or send a       *
- * letter to Creative Commons, 171 Second Street, Suite 300,            *
- * San Francisco, California, 94105, USA.                               *
- *----------------------------------------------------------------------*/
+// Arduino Button Library
+// https://github.com/JChristensen/JC_Button
+// Copyright (C) 2018 by Jack Christensen and licensed under
+// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+//
+// Example sketch to turn an LED on and off with a tactile button switch.
+// Wire the switch from the Arduino pin to ground.
 
-#include <JC_Button.h>     //https://github.com/JChristensen/JC_Button
+#include <JC_Button.h>          // https://github.com/JChristensen/JC_Button
 
-#define BUTTON_PIN 7       //Connect a tactile button switch (or something similar) from this pin to ground.
-#define PULLUP true        //To keep things simple, we use the Arduino's internal pullup resistor.
-#define INVERT true        //Since the pullup resistor will keep the pin high unless the
-                           //switch is closed, this is negative logic, i.e. a high state
-                           //means the button is NOT pressed. (Assuming a normally open switch.)
-#define DEBOUNCE_MS 25     //A debounce time of 25 milliseconds usually works well for tactile button switches.
-#define LED_PIN 13         //The standard Arduino "Pin 13" LED
+// pin assignments
+const byte
+    BUTTON_PIN(7),              // connect a button switch from this pin to ground
+    LED_PIN(13);                // the standard Arduino "pin 13" LED
 
-Button myBtn(BUTTON_PIN, PULLUP, INVERT, DEBOUNCE_MS);    //Define the button
-boolean ledState;          //A variable that keeps the current LED status
+Button myBtn(BUTTON_PIN);       // define the button
 
 void setup()
 {
-    pinMode(LED_PIN, OUTPUT);    //Set the LED pin as an output
+    myBtn.begin();              // initialize the button object
+    pinMode(LED_PIN, OUTPUT);   // set the LED pin as an output
 }
 
 void loop()
 {
-    myBtn.read();                    //Read the button
+    static bool ledState;       // a variable that keeps the current LED status
+    myBtn.read();               // read the button
 
-    if (myBtn.wasReleased()) {       //If the button was released, change the LED state
+    if (myBtn.wasReleased())    // if the button was released, change the LED state
+    {
         ledState = !ledState;
         digitalWrite(LED_PIN, ledState);
     }
 }
-
 

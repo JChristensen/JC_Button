@@ -1,18 +1,12 @@
-/*----------------------------------------------------------------------*
- * Arduino Button Library v1.0                                          *
- * Jack Christensen May 2011, published Mar 2012                        *
- *                                                                      *
- * Library for reading momentary contact switches like tactile button   *
- * switches. Intended for use in state machine constructs.              *
- * Use the read() function to read all buttons in the main loop,        *
- * which should execute as fast as possible.                            *
- *                                                                      *
- * This work is licensed under the Creative Commons Attribution-        *
- * ShareAlike 3.0 Unported License. To view a copy of this license,     *
- * visit http://creativecommons.org/licenses/by-sa/3.0/ or send a       *
- * letter to Creative Commons, 171 Second Street, Suite 300,            *
- * San Francisco, California, 94105, USA.                               *
- *----------------------------------------------------------------------*/
+// Arduino Button Library
+// https://github.com/JChristensen/JC_Button
+// Copyright (C) 2018 by Jack Christensen and licensed under
+// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+//
+// Library for reading momentary contact switches like tactile button
+// switches. Intended for use in state machine constructs.
+// Use the read() function to read each button in the main loop,
+// which should execute as fast as possible.
 
 #include "JC_Button.h"
 
@@ -29,53 +23,41 @@
  * (Note that invert cannot be implied from puEnable since an external  *
  *  pullup could be used.)                                              *
  *----------------------------------------------------------------------*/
-Button::Button(uint8_t pin, uint8_t puEnable, uint8_t invert, uint32_t dbTime)
+
+void Button::begin()
 {
-    _pin = pin;
-    _puEnable = puEnable;
-    _invert = invert;
-    _dbTime = dbTime;
-    if (_puEnable != 0)
-        pinMode(_pin, INPUT_PULLUP);    //enable pullup resistor
-    else
-        pinMode(_pin, INPUT);
-    _state = digitalRead(_pin);
-    if (_invert != 0) _state = !_state;
-    _time = millis();
-    _lastState = _state;
-    _changed = 0;
-    _lastChange = _time;
+    pinMode(m_pin, m_puEnable ? INPUT_PULLUP : INPUT);
+    m_state = digitalRead(m_pin);
+    if (m_invert) m_state = !m_state;
+    m_time = millis();
+    m_lastState = m_state;
+    m_changed = false;
+    m_lastChange = m_time;
 }
 
 /*----------------------------------------------------------------------*
- * read() returns the state of the button, 1==pressed, 0==released,     *
- * does debouncing, captures and maintains times, previous states, etc. *
- *----------------------------------------------------------------------*/
-uint8_t Button::read(void)
+/ returns the state of the button, true==pressed, false==released,      *
+/ does debouncing, captures and maintains times, previous states, etc.  *
+/-----------------------------------------------------------------------*/
+bool Button::read()
 {
-    static uint32_t ms;
-    static uint8_t pinVal;
-
-    ms = millis();
-    pinVal = digitalRead(_pin);
-    if (_invert != 0) pinVal = !pinVal;
-    if (ms - _lastChange < _dbTime) {
-        _time = ms;
-        _changed = 0;
-        return _state;
+    uint32_t ms = millis();
+    uint8_t pinVal = digitalRead(m_pin);
+    if (m_invert) pinVal = !pinVal;
+    if (ms - m_lastChange < m_dbTime)
+    {
+        m_time = ms;
+        m_changed = false;
+        return m_state;
     }
-    else {
-        _lastState = _state;
-        _state = pinVal;
-        _time = ms;
-        if (_state != _lastState)   {
-            _lastChange = ms;
-            _changed = 1;
-        }
-        else {
-            _changed = 0;
-        }
-        return _state;
+    else
+    {
+        m_lastState = m_state;
+        m_state = pinVal;
+        m_time = ms;
+        m_changed = (m_state != m_lastState);
+        if (m_changed) m_lastChange = ms;
+        return m_state;
     }
 }
 
@@ -84,14 +66,14 @@ uint8_t Button::read(void)
  * read, and return false (0) or true (!=0) accordingly.                *
  * These functions do not cause the button to be read.                  *
  *----------------------------------------------------------------------*/
-uint8_t Button::isPressed(void)
+bool Button::isPressed()
 {
-    return _state == 0 ? 0 : 1;
+    return m_state;
 }
 
-uint8_t Button::isReleased(void)
+bool Button::isReleased()
 {
-    return _state == 0 ? 1 : 0;
+    return m_state;
 }
 
 /*----------------------------------------------------------------------*
@@ -100,37 +82,37 @@ uint8_t Button::isReleased(void)
  * true (!=0) accordingly.                                              *
  * These functions do not cause the button to be read.                  *
  *----------------------------------------------------------------------*/
-uint8_t Button::wasPressed(void)
+bool Button::wasPressed()
 {
-    return _state && _changed;
+    return m_state && m_changed;
 }
 
-uint8_t Button::wasReleased(void)
+bool Button::wasReleased()
 {
-    return !_state && _changed;
+    return !m_state && m_changed;
 }
 
 /*----------------------------------------------------------------------*
  * pressedFor(ms) and releasedFor(ms) check to see if the button is     *
  * pressed (or released), and has been in that state for the specified  *
- * time in milliseconds. Returns false (0) or true (1) accordingly.     *
+ * time in milliseconds. Returns false (0) or true (!=0) accordingly.   *
  * These functions do not cause the button to be read.                  *
  *----------------------------------------------------------------------*/
-uint8_t Button::pressedFor(uint32_t ms)
+bool Button::pressedFor(uint32_t ms)
 {
-    return (_state == 1 && _time - _lastChange >= ms) ? 1 : 0;
+    return m_state && m_time - m_lastChange >= ms;
 }
 
-uint8_t Button::releasedFor(uint32_t ms)
+bool Button::releasedFor(uint32_t ms)
 {
-    return (_state == 0 && _time - _lastChange >= ms) ? 1 : 0;
+    return !m_state && m_time - m_lastChange >= ms;
 }
 
 /*----------------------------------------------------------------------*
  * lastChange() returns the time the button last changed state,         *
  * in milliseconds.                                                     *
  *----------------------------------------------------------------------*/
-uint32_t Button::lastChange(void)
+uint32_t Button::lastChange()
 {
-    return _lastChange;
+    return m_lastChange;
 }

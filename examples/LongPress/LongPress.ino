@@ -1,59 +1,53 @@
-/*----------------------------------------------------------------------*
- * Example sketch for Arduino Button Library by Jack Christensen        *
- *                                                                      *
- * An example that uses both short and long button presses.             *
- *                                                                      *
- * A simple state machine where a short press of the button turns the   *
- * Arduino pin 13 LED on or off, and a long press causes the LED to     *
- * blink rapidly. Once in rapid blink mode, another long press goes     *
- * back to on/off mode.                                                 *
- *                                                                      *
- * This work is licensed under the Creative Commons Attribution-        *
- * ShareAlike 3.0 Unported License. To view a copy of this license,     *
- * visit http://creativecommons.org/licenses/by-sa/3.0/ or send a       *
- * letter to Creative Commons, 171 Second Street, Suite 300,            *
- * San Francisco, California, 94105, USA.                               *
- *----------------------------------------------------------------------*/
+// Arduino Button Library
+// https://github.com/JChristensen/JC_Button
+// Copyright (C) 2018 by Jack Christensen and licensed under
+// GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+//
+// Example sketch demonstrating short and long button presses.
+//
+// A simple state machine where a short press of the button turns the
+// Arduino pin 13 LED on or off, and a long press causes the LED to
+// blink rapidly. Once in rapid blink mode, another long press goes
+// back to on/off mode.
 
-#include <JC_Button.h>     //https://github.com/JChristensen/JC_Button
+#include <JC_Button.h>          // https://github.com/JChristensen/JC_Button
 
-#define BUTTON_PIN 7       //Connect a tactile button switch (or something similar) from this pin to ground.
-#define PULLUP true        //To keep things simple, we use the Arduino's internal pullup resistor.
-#define INVERT true        //Since the pullup resistor will keep the pin high unless the
-                           //switch is closed, this is negative logic, i.e. a high state
-                           //means the button is NOT pressed. (Assuming a normally open switch.)
-#define DEBOUNCE_MS 25     //A debounce time of 20 milliseconds usually works well for tactile button switches.
+// pin assignments
+const byte
+    BUTTON_PIN(7),              // connect a button switch from this pin to ground
+    LED_PIN(13);                // the standard Arduino "pin 13" LED
 
-#define LED_PIN 13         //The standard Arduino "Pin 13" LED.
-#define LONG_PRESS 1000    //We define a "long press" to be 1000 milliseconds.
-#define BLINK_INTERVAL 100 //In the BLINK state, switch the LED every 100 milliseconds.
-
-Button myBtn(BUTTON_PIN, PULLUP, INVERT, DEBOUNCE_MS);    //Define the button
-
-//The list of possible states for the state machine. This state machine has a fixed
-//sequence of states, i.e. ONOFF --> TO_BLINK --> BLINK --> TO_ONOFF --> ONOFF
-//Note that while the user perceives two "modes", i.e. ON/OFF mode and rapid blink mode,
-//two extra states are needed in the state machine to transition between these modes.
-enum {ONOFF, TO_BLINK, BLINK, TO_ONOFF};       
-uint8_t STATE;                   //The current state machine state
-boolean ledState;                //The current LED status
-unsigned long ms;                //The current time from millis()
-unsigned long msLast;            //The last time the LED was switched
+Button myBtn(BUTTON_PIN);       // define the button
+const unsigned long
+    LONG_PRESS(1000),           // we define a "long press" to be 1000 milliseconds.
+    BLINK_INTERVAL(100);        // in the BLINK state, switch the LED every 100 milliseconds.
 
 void setup()
 {
-    pinMode(LED_PIN, OUTPUT);    //Set the LED pin as an output
+    myBtn.begin();              // initialize the button object
+    pinMode(LED_PIN, OUTPUT);   // set the LED pin as an output
 }
+
+// the list of possible states for the state machine. This state machine has a fixed
+// sequence of states, i.e. ONOFF --> TO_BLINK --> BLINK --> TO_ONOFF --> ONOFF
+// note that while the user perceives two "modes", i.e. ON/OFF mode and rapid blink mode,
+// two extra states are needed in the state machine to transition between these modes.
+enum states_t {ONOFF, TO_BLINK, BLINK, TO_ONOFF};       
+
+bool ledState;                  // current LED status
+unsigned long ms;               // current time from millis()
+unsigned long msLast;           // last time the LED was switched
 
 void loop()
 {
-    ms = millis();               //record the current time
-    myBtn.read();                //Read the button
+    static states_t STATE;      // current state machine state
+    ms = millis();              // record the current time
+    myBtn.read();               // read the button
     
-    switch (STATE) {
-        
-        //This state watches for short and long presses, switches the LED for
-        //short presses, and moves to the TO_BLINK state for long presses.
+    switch (STATE)
+    {
+        // this state watches for short and long presses, switches the LED for
+        // short presses, and moves to the TO_BLINK state for long presses.
         case ONOFF:                
             if (myBtn.wasReleased())
                 switchLED();
@@ -61,9 +55,9 @@ void loop()
                 STATE = TO_BLINK;
             break;
             
-        //This is a transition state where we start the fast blink as feedback to the user,
-        //but we also need to wait for the user to release the button, i.e. end the
-        //long press, before moving to the BLINK state.
+        // this is a transition state where we start the fast blink as feedback to the user,
+        // but we also need to wait for the user to release the button, i.e. end the
+        // long press, before moving to the BLINK state.
         case TO_BLINK:
             if (myBtn.wasReleased())
                 STATE = BLINK;
@@ -71,10 +65,11 @@ void loop()
                 fastBlink();
             break;
             
-        //The fast-blink state. Watch for another long press which will cause us to
-        //turn the LED off (as feedback to the user) and move to the TO_ONOFF state.
+        // the fast-blink state. Watch for another long press which will cause us to
+        // turn the LED off (as feedback to the user) and move to the TO_ONOFF state.
         case BLINK:
-            if (myBtn.pressedFor(LONG_PRESS)) {
+            if (myBtn.pressedFor(LONG_PRESS))
+            {
                 STATE = TO_ONOFF;
                 digitalWrite(LED_PIN, LOW);
                 ledState = false;
@@ -83,8 +78,8 @@ void loop()
                 fastBlink();
             break;
             
-        //This is a transition state where we just wait for the user to release the button
-        //before moving back to the ONOFF state.
+        // this is a transition state where we just wait for the user to release the button
+        // before moving back to the ONOFF state.
         case TO_ONOFF:
             if (myBtn.wasReleased())
                 STATE = ONOFF;
@@ -92,15 +87,15 @@ void loop()
     }
 }
 
-//Reverse the current LED state. If it's on, turn it off. If it's off, turn it on.
+// reverse the current LED state. if it's on, turn it off. If it's off, turn it on.
 void switchLED()
 {
-    msLast = ms;                 //record the last switch time
+    msLast = ms;                // record the last switch time
     ledState = !ledState;
     digitalWrite(LED_PIN, ledState);
 }
 
-//Switch the LED on and off every BLINK_INETERVAL milliseconds.
+// switch the LED on and off every BLINK_INETERVAL milliseconds.
 void fastBlink()
 {
     if (ms - msLast >= BLINK_INTERVAL)
