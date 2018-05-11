@@ -50,7 +50,7 @@ Button myButton(3, 50);
 Button myButton(4, 25, false, false);
 
 ```
-##Library Functions
+## Library Functions
 
 ### begin()
 ##### Description
