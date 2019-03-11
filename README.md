@@ -3,7 +3,7 @@ https://github.com/JChristensen/JC_Button
 README file  
 
 ## License
-Arduino Button Library Copyright (C) 2018 Jack Christensen GNU GPL v3.0
+Arduino Button Library Copyright (C) 2018-2019 Jack Christensen GNU GPL v3.0
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License v3.0 as published by the Free Software Foundation.
 
@@ -16,14 +16,18 @@ The Button library is for debouncing and reading momentary contact switches like
 
 The simplest way to use a button with an AVR microcontroller is to wire the button between a GPIO pin and ground, and turn on the AVR internal pullup resistor. The Button class constructor takes four arguments, but three have default values that work for a button wired in this manner.
 
+A derived class, ToggleButton, implements button objects that need only "push-on, push-off" functionality.
+
 ## Examples
 The following example sketches are included with the **Button** library:
 
 - **SimpleOnOff**: Just turns the Arduino's pin 13 LED on and off.
 - **LongPress**: Demonstrates detecting long and short button presses.
 - **UpDown**: Counts up or down, one number at a time or rapidly by holding the button down.
+- **Toggle**: Demonstrates ToggleButton functionality.
 
-## Constructor
+
+## Constructors
 
 ### Button(pin, dbTime, puEnable, invert)
 ##### Description
@@ -50,7 +54,38 @@ Button myButton(3, 50);
 Button myButton(4, 25, false, false);
 
 ```
-## Library Functions
+
+### ToggleButton(pin, initialState, dbTime, puEnable, invert)
+##### Description
+The constructor defines a toggle button object, which has "push-on, push-off" functionality. The initial state can be on or off. See the section, [ToggleButton Library Functions](https://github.com/JChristensen/JC_Button#togglebutton-library-functions) for functions that apply specifically to the ToggleButton object. The ToggleButton class is derived from the Button class, so all Button functions are available, but because it is inherently a more limited concept, the special ToggleButton functions will be most useful, along with `begin()` and `read()`.
+##### Syntax
+`ToggleButton(pin, initialState, dbTime, puEnable, invert);`
+##### Required parameter
+**pin:** Arduino pin number that the button is connected to *(byte)*  
+##### Optional parameters
+**initialState:** Initial state for the button. Defaults to off (false) if not given. *(bool)*  
+**dbTime:** Debounce time in milliseconds. Defaults to 25ms if not given. *(unsigned long)*  
+**puEnable:** *true* to enable the microcontroller's internal pull-up resistor, else *false*. Defaults to *true* if not given. *(bool)*  
+**invert:** *false* interprets a high logic level to mean the button is pressed, *true* interprets a low level as pressed. *true* should be used when a pull-up resistor is employed, *false* for a pull-down resistor. Defaults to *true* if not given. *(bool)*
+##### Returns
+None.
+##### Example
+```c++
+// button connected from pin 2 to ground, initial state off,
+// 25ms debounce, pullup enabled, logic inverted
+ToggleButton myToggle(2);
+
+// same as above but this button is initially "on" and also
+// needs a longer debounce time (50ms).
+ToggleButton myToggle(3, true, 50);
+
+// a button wired from the MCU pin to Vcc with an external pull-down resistor,
+// initial state is off.
+Button myButton(4, false, 25, false, false);
+
+```
+
+## Button Library Functions
 
 ### begin()
 ##### Description
@@ -73,7 +108,7 @@ Reads the button and returns a *boolean* value (*true* or *false*) to indicate w
 ##### Parameters
 None.
 ##### Returns
-*true* if the button is pressed, *else* false *(bool)*
+*true* if the button is pressed, else *false* *(bool)*
 ##### Example
 ```c++
 myButton.read();
@@ -152,4 +187,48 @@ The time in milliseconds when the button last changed state *(unsigned long)*
 ##### Example
 ```c++
 unsigned long msLastChange = myButton.lastChange();
+```
+
+## ToggleButton Library Functions
+
+### changed()
+##### Description
+Returns a boolean value (true or false) to indicate whether the toggle button changed state the last time `read()` was called.
+##### Syntax
+`myToggle.changed();`
+##### Parameters
+None.
+##### Returns
+*true* if the toggle state changed, else *false* *(bool)*
+##### Example
+```c++
+if (myToggle.changed())
+{
+    // do something
+}
+else
+{
+    // do something different
+}
+```
+
+### toggleState()
+##### Description
+Returns a boolean value (true or false) to indicate the toggle button state as of the last time `read()` was called.
+##### Syntax
+`myToggle.toggleState();`
+##### Parameters
+None.
+##### Returns
+*true* if the toggle is "on", else *false* *(bool)*
+##### Example
+```c++
+if (myToggle.toggleState())
+{
+    // do something
+}
+else
+{
+    // do something different
+}
 ```

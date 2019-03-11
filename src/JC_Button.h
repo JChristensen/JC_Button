@@ -70,4 +70,42 @@ class Button
         uint32_t m_time;        // time of current state (ms from millis)
         uint32_t m_lastChange;  // time of last state change (ms)
 };
+
+// a derived class for a "push-on, push-off" (toggle) type button.
+// initial state can be given, default is off (false).
+class ToggleButton : public Button
+{
+    public:
+    
+        // constructor is similar to Button, but includes the initial state for the toggle.
+        ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
+            : Button(pin, dbTime, puEnable, invert), m_toggleState(initialState) {}
+
+        // read the button and return its state.
+        // should be called frequently.
+        bool read()
+        {
+            Button::read();
+            if (wasPressed())
+            {
+                m_toggleState = !m_toggleState;
+                m_changed = true;
+            }
+            else
+            {
+                m_changed = false;
+            }
+            return m_toggleState;
+        }
+
+        // has the state changed?
+        bool changed() {return m_changed;}
+
+        // return the current state
+        bool toggleState() {return m_toggleState;}
+
+    private:
+        bool m_toggleState;
+        bool m_changed;
+};
 #endif
