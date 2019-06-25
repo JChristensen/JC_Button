@@ -73,15 +73,16 @@ void loop()
             }
             break;
 
-        case INCR:                              // increment the counter
-            count = min(count++, MAX_COUNT);    // but not more than the specified maximum
+        case INCR:
+            ++count;                            // increment the counter
+            count = min(count, MAX_COUNT);      // but not more than the specified maximum
             STATE = WAIT;
             break;
 
-        case DECR:                              // decrement the counter
-            count = max(count--, MIN_COUNT);    // but not less than the specified minimum
+        case DECR:
+            --count;                            // decrement the counter
+            count = max(count, MIN_COUNT);      // but not less than the specified minimum
             STATE = WAIT;
             break;
     }
 }
-
