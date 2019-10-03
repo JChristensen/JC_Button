@@ -1,3 +1,4 @@
+JC_Button	KEYWORD1
 Button	KEYWORD1
 ToggleButton	KEYWORD1
 begin	KEYWORD2
