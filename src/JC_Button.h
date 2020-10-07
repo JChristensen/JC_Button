@@ -30,6 +30,8 @@ class Button
         // false for released. Call this function frequently to ensure
         // the sketch is responsive to user input.
         bool read();
+        bool read(uint32_t ms);
+        bool read(uint32_t ms, bool pinVal);
 
         // Returns true if the button state was pressed at the last call to read().
         // Does not cause the button to be read.
