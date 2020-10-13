@@ -25,7 +25,11 @@ void Button::begin()
 /-----------------------------------------------------------------------*/
 bool Button::read()
 {
-    return Button::read(millis());
+    return Button::read(millis(), digitalRead(m_pin));
+}
+bool Button::read(bool pinVal)
+{
+    return Button::read(millis(), pinVal);
 }
 bool Button::read(uint32_t ms)
 {

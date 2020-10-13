@@ -30,6 +30,7 @@ class Button
         // false for released. Call this function frequently to ensure
         // the sketch is responsive to user input.
         bool read();
+        bool read(bool pinVal);
         bool read(uint32_t ms);
         bool read(uint32_t ms, bool pinVal);
 
@@ -78,7 +79,7 @@ class Button
 class ToggleButton : public Button
 {
     public:
-    
+
         // constructor is similar to Button, but includes the initial state for the toggle.
         ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
             : Button(pin, dbTime, puEnable, invert), m_toggleState(initialState) {}
