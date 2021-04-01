@@ -7,6 +7,7 @@
 #define JC_BUTTON_H_INCLUDED
 
 #include <Arduino.h>
+#include <Adafruit_mcp23017.h>
 
 class Button
 {
@@ -20,8 +21,14 @@ class Button
         // dbTime   Debounce time in milliseconds (default 25ms)
         // puEnable true to enable the AVR internal pullup resistor (default true)
         // invert   true to interpret a low logic level as pressed (default true)
+        // For overloaded constructor:
+        // mcp      the address of the I/O extender on which the pin resides. You must use the address_of
+        //          operator when passing name of the I/O extender. I.E. &name
         Button(uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
             : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert) {}
+    
+        Button(int mcp, uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
+            : m_mcp(mcp), m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert) {}
 
         // Initialize a Button object and the pin it's connected to
         void begin();
@@ -69,6 +76,7 @@ class Button
         bool m_changed;         // state changed since last read
         uint32_t m_time;        // time of current state (ms from millis)
         uint32_t m_lastChange;  // time of last state change (ms)
+        Adafruit_MCP23017* m_mcp; 				// address of Adafruit_mcp23017 object
 };
 
 // a derived class for a "push-on, push-off" (toggle) type button.
@@ -80,6 +88,9 @@ class ToggleButton : public Button
         // constructor is similar to Button, but includes the initial state for the toggle.
         ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
             : Button(pin, dbTime, puEnable, invert), m_toggleState(initialState) {}
+            
+        ToggleButton(int mcp, uint8_t pin, bool initialState=false, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
+            : Button(mcp, pin, dbTime, puEnable, invert), m_toggleState(initialState) {}
 
         // read the button and return its state.
         // should be called frequently.
