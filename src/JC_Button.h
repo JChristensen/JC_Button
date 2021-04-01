@@ -8,7 +8,6 @@
 #define JC_BUTTON_H_INCLUDED
 
 #include <Arduino.h>
-#include <Adafruit_mcp23017.h>
 
 class Button
 {
