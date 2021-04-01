@@ -2,6 +2,7 @@
 // https://github.com/JChristensen/JC_Button
 // Copyright (C) 2018 by Jack Christensen and licensed under
 // GNU GPL v3.0, https://www.gnu.org/licenses/gpl.html
+// Modified by Dennis Loyer to work with MCP23017 I/O extender
 
 #ifndef JC_BUTTON_H_INCLUDED
 #define JC_BUTTON_H_INCLUDED
