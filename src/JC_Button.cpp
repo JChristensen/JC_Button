@@ -19,7 +19,7 @@ void Button::begin()
     m_lastChange = m_time;
 
     m_pressCount = 0;
-    pressRead = false;
+    m_pressRead = false;
 }
 
 /*----------------------------------------------------------------------*
