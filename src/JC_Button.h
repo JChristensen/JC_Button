@@ -59,6 +59,13 @@ class Button
         // changed state.
         uint32_t lastChange();
 
+        // returns the number of presses done in rapid succession
+        uint8_t multiPressRead();
+
+        // overrides the time in ms it allows the next press to arrive to
+        // count as a multi-press
+        void setMultiPressTimer(uint32_t multiPressTimeLimit);
+
     private:
         uint8_t m_pin;          // arduino pin number connected to button
         uint32_t m_dbTime;      // debounce time (ms)
@@ -69,6 +76,14 @@ class Button
         bool m_changed;         // state changed since last read
         uint32_t m_time;        // time of current state (ms from millis)
         uint32_t m_lastChange;  // time of last state change (ms)
+        
+        uint8_t  m_pressCount;  // count the times button is pressed in rapid succession
+        bool m_pressRead;       // bool status to make sure m_pressCount only increment once with one button press
+        uint32_t m_multiPressTimeLimit = 200; //time in ms it allows for next press to arrive to count as a multi-press
+
+        //checks if the next press arrives
+        //in the allowed time limit or not
+        uint8_t checkMultiPress();
 };
 
 // a derived class for a "push-on, push-off" (toggle) type button.

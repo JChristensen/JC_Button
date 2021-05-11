@@ -17,6 +17,9 @@ void Button::begin()
     m_lastState = m_state;
     m_changed = false;
     m_lastChange = m_time;
+
+    m_pressCount = 0;
+    pressRead = false;
 }
 
 /*----------------------------------------------------------------------*
@@ -41,6 +44,53 @@ bool Button::read()
     }
     m_time = ms;
     return m_state;
+}
+
+/*----------------------------------------------------------------------*
+ * multiPressRead() checks the time between changes in the m_state      *
+ * If it changes quick enough, it'll detect it as a multi presses       *
+ * If a set time passes without another press, it'll return the times   *
+ * it got multi-pressed
+ *----------------------------------------------------------------------*/
+uint8_t Button::multiPressRead() {
+
+    if (read()) {
+        //makes sure it counts the press ONLY once
+        if (!m_pressRead) {
+            m_pressCount++;
+            m_pressRead = true;
+        }
+        return checkMultiPress();
+    }
+
+    if (!read()) {
+        m_pressRead = false;
+        return checkMultiPress();
+    }
+}
+
+/*----------------------------------------------------------------------*
+ * Checks the time that passed without another press. If it exceeds the *
+ * limit, it returns the amount of fast presses it counted.             *
+ *----------------------------------------------------------------------*/
+uint8_t Button::checkMultiPress() {
+
+    if (millis() - m_lastChange > m_multiPressTimeLimit) {
+        uint8_t numberOfPresses = m_pressCount;
+        m_pressCount = 0;
+        return numberOfPresses;
+    }
+    else {
+        return 0;
+    }
+}
+
+/*----------------------------------------------------------------------*
+ * Sets the time in ms for the next button press to be counted as       *
+ * a successive multi press.                                            *
+ *----------------------------------------------------------------------*/
+void Button::setMultiPressTimer(uint32_t multiPressTimeLimit) {
+    m_multiPressTimeLimit = multiPressTimeLimit;
 }
 
 /*----------------------------------------------------------------------*
