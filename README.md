@@ -1,5 +1,6 @@
 # Arduino Button Library
 https://github.com/JChristensen/JC_Button  
+https://github.com/Kuantronic/JC_Button   
 README file  
 
 ## License
@@ -12,6 +13,10 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/gpl.html>
 
 ## Introduction
+This is a modified version of Jack Christensen's JC_Button library by Kuantronic. It adds the functionality to detect mutliple presses on a single button. The Arduino can do certain tasks based on the amount of time that button is pressed quickly.
+
+The rest of the README contains the original content plus the info needed to use the muli-press functionality.
+
 The Button library is for debouncing and reading momentary contact switches like tactile button switches.  "Long presses" of arbitrary length can be detected. Works well in state machine constructs.  Use the read() function to read each button in the main loop, which should execute as fast as possible.
 
 The simplest way to use a button with an AVR microcontroller is to wire the button between a GPIO pin and ground, and turn on the AVR internal pullup resistor. The Button class constructor takes four arguments, but three have default values that work for a button wired in this manner.
@@ -189,27 +194,50 @@ The time in milliseconds when the button last changed state *(unsigned long)*
 unsigned long msLastChange = myButton.lastChange();
 ```
 
-## ToggleButton Library Functions
-
-### changed()
+### multiPressRead()
 ##### Description
-Returns a boolean value (true or false) to indicate whether the toggle button changed state the last time `read()` was called.
+Reads the button to detect when it's pressed and released in fast successions. Think of the audio control in Apple's wired EarPods headphones. It detects single press to resume/pause, double press to skip forward, and triple press to skip backward. 
+Like the read() function, this needs to be called as frequently as possible to be working and/or effective.
+Can count up to 255 presses but up to 4 quick presses should be more than enough for 99.99% of the use cases.
 ##### Syntax
-`myToggle.changed();`
+`myBtn.multiPressRead();`
 ##### Parameters
 None.
 ##### Returns
-*true* if the toggle state changed, else *false* *(bool)*
+The amount of time it was pressed in fast succession in *uint8_t*. It only returns a value other than 0 after the wait time for the next successive button press/release expires.
 ##### Example
 ```c++
-if (myToggle.changed())
-{
-    // do something
-}
-else
-{
-    // do something different
-}
+ uint8_t numOfPresses = myBtn.multiPressRead();
+ switch (numOfPresses){
+    case 1:
+      //single press
+      break;
+    case 2:
+      //double press
+      break;
+    case 3:
+      //triple press
+      break;
+    case 4:
+      //quadruple press
+    default:
+      //zero press, still waiting for more presses, or past quadruple press
+      break;
+  }
+```
+
+### setMultiPressTimer()
+##### Description
+Sets the time the button will wait for the next press to be counted as a fast successive press. Default time is 200 ms.
+##### Syntax
+`myBtn.setMultiPressTimer(ms);`
+##### Parameters
+**ms:** Time in milliseconds *(unsigned long)*
+##### Returns
+None.
+##### Example
+```c++
+myBtn.setMultiPressTimer(250);
 ```
 
 ### toggleState()
