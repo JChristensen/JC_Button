@@ -29,8 +29,6 @@ void Button::begin()
 bool Button::read()
 {
     uint32_t ms = millis();
-    bool pinVal = digitalRead(m_pin);
-    if (m_invert) pinVal = !pinVal;
     if (ms - m_lastChange < m_dbTime)
     {
         m_changed = false;
@@ -38,7 +36,8 @@ bool Button::read()
     else
     {
         m_lastState = m_state;
-        m_state = pinVal;
+        m_state = digitalRead(m_pin);
+        if (m_invert) m_state = !m_state;
         m_changed = (m_state != m_lastState);
         if (m_changed) m_lastChange = ms;
     }
