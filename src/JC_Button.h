@@ -23,41 +23,41 @@ class Button
         Button(uint8_t pin, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
             : m_pin(pin), m_dbTime(dbTime), m_puEnable(puEnable), m_invert(invert) {}
 
-        // Initialize a Button object and the pin it's connected to
+        // Initialize a Button object
         void begin();
 
-        // Returns the current debounced button state, true for pressed,
-        // false for released. Call this function frequently to ensure
-        // the sketch is responsive to user input.
+        // Returns the state of the button, true if pressed, false if released.
+        // Does debouncing, captures and maintains times, previous state, etc.
+        // Call this function frequently to ensure the sketch is responsive to user input.
         bool read();
 
         // Returns true if the button state was pressed at the last call to read().
         // Does not cause the button to be read.
-        bool isPressed();
+        bool isPressed() {return m_state;}
 
         // Returns true if the button state was released at the last call to read().
         // Does not cause the button to be read.
-        bool isReleased();
+        bool isReleased() {return !m_state;}
 
-        // Returns true if the button state at the last call to read() was pressed,
-        // and this was a change since the previous read.
-        bool wasPressed();
-
-        // Returns true if the button state at the last call to read() was released,
-        // and this was a change since the previous read.
-        bool wasReleased();
+        // These functions check the button state to see if it changed
+        // between the last two reads and return true or false accordingly.
+        // These functions do not cause the button to be read.
+        bool wasPressed() {return m_state && m_changed;}
+        bool wasReleased() {return !m_state && m_changed;}
 
         // Returns true if the button state at the last call to read() was pressed,
         // and has been in that state for at least the given number of milliseconds.
-        bool pressedFor(uint32_t ms);
+        // This function does not cause the button to be read.
+        bool pressedFor(uint32_t ms) {return m_state && m_time - m_lastChange >= ms;}
 
         // Returns true if the button state at the last call to read() was released,
         // and has been in that state for at least the given number of milliseconds.
-        bool releasedFor(uint32_t ms);
+        // This function does not cause the button to be read.
+        bool releasedFor(uint32_t ms) {return !m_state && m_time - m_lastChange >= ms;}
 
         // Returns the time in milliseconds (from millis) that the button last
         // changed state.
-        uint32_t lastChange();
+        uint32_t lastChange() {return m_lastChange;}
 
     private:
         uint8_t m_pin;          // arduino pin number connected to button
@@ -76,7 +76,7 @@ class Button
 class ToggleButton : public Button
 {
     public:
-    
+
         // constructor is similar to Button, but includes the initial state for the toggle.
         ToggleButton(uint8_t pin, bool initialState=false, uint32_t dbTime=25, uint8_t puEnable=true, uint8_t invert=true)
             : Button(pin, dbTime, puEnable, invert), m_toggleState(initialState) {}
@@ -86,13 +86,11 @@ class ToggleButton : public Button
         bool read()
         {
             Button::read();
-            if (wasPressed())
-            {
+            if (wasPressed()) {
                 m_toggleState = !m_toggleState;
                 m_changed = true;
             }
-            else
-            {
+            else {
                 m_changed = false;
             }
             return m_toggleState;
