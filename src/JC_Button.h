@@ -33,42 +33,42 @@ class Button
 
         // Returns true if the button state was pressed at the last call to read().
         // Does not cause the button to be read.
-        bool isPressed() {return m_state;}
+        bool isPressed() const {return m_state;}
 
         // Returns true if the button state was released at the last call to read().
         // Does not cause the button to be read.
-        bool isReleased() {return !m_state;}
+        bool isReleased() const {return !m_state;}
 
         // These functions check the button state to see if it changed
         // between the last two reads and return true or false accordingly.
         // These functions do not cause the button to be read.
-        bool wasPressed() {return m_state && m_changed;}
-        bool wasReleased() {return !m_state && m_changed;}
+        bool wasPressed() const {return m_state && m_changed;}
+        bool wasReleased() const {return !m_state && m_changed;}
 
         // Returns true if the button state at the last call to read() was pressed,
         // and has been in that state for at least the given number of milliseconds.
         // This function does not cause the button to be read.
-        bool pressedFor(uint32_t ms) {return m_state && m_time - m_lastChange >= ms;}
+        bool pressedFor(uint32_t ms) const {return m_state && m_time - m_lastChange >= ms;}
 
         // Returns true if the button state at the last call to read() was released,
         // and has been in that state for at least the given number of milliseconds.
         // This function does not cause the button to be read.
-        bool releasedFor(uint32_t ms) {return !m_state && m_time - m_lastChange >= ms;}
+        bool releasedFor(uint32_t ms) const {return !m_state && m_time - m_lastChange >= ms;}
 
         // Returns the time in milliseconds (from millis) that the button last
         // changed state.
-        uint32_t lastChange() {return m_lastChange;}
+        uint32_t lastChange() const {return m_lastChange;}
 
     private:
-        uint8_t m_pin;          // arduino pin number connected to button
-        uint32_t m_dbTime;      // debounce time (ms)
-        bool m_puEnable;        // internal pullup resistor enabled
-        bool m_invert;          // if true, interpret logic low as pressed, else interpret logic high as pressed
-        bool m_state;           // current button state, true=pressed
-        bool m_lastState;       // previous button state
-        bool m_changed;         // state changed since last read
-        uint32_t m_time;        // time of current state (ms from millis)
-        uint32_t m_lastChange;  // time of last state change (ms)
+        uint8_t m_pin;                  // arduino pin number connected to button
+        uint32_t m_dbTime;              // debounce time (ms)
+        bool m_puEnable;                // internal pullup resistor enabled
+        bool m_invert;                  // if true, interpret logic low as pressed, else interpret logic high as pressed
+        bool m_state = false;           // current button state, true=pressed
+        bool m_lastState = false;       // previous button state
+        bool m_changed = false;         // state changed since last read
+        uint32_t m_time = 0;            // time of current state (ms from millis)
+        uint32_t m_lastChange = 0;      // time of last state change (ms)
 };
 
 // a derived class for a "push-on, push-off" (toggle) type button.
@@ -97,13 +97,13 @@ class ToggleButton : public Button
         }
 
         // has the state changed?
-        bool changed() {return m_changed;}
+        bool changed() const {return m_changed;}
 
         // return the current state
-        bool toggleState() {return m_toggleState;}
+        bool toggleState() const {return m_toggleState;}
 
     private:
         bool m_toggleState;
-        bool m_changed;
+        bool m_changed = false;
 };
 #endif
