@@ -21,18 +21,32 @@ void Button::begin()
 // does debouncing, captures and maintains times, previous state, etc.
 bool Button::read()
 {
-    uint32_t ms = millis();
+    m_time = millis();
     bool pinVal = digitalRead(m_pin);
     if (m_invert) pinVal = !pinVal;
-    if (ms - m_lastChange < m_dbTime) {
-        m_changed = false;
+
+    switch (m_fsm) {
+        case STABLE:
+            if (pinVal != m_state) {    // maybe a change, but debounce first
+                m_dbStart = m_time;
+                m_fsm = DEBOUNCE;
+            }
+            else {                      // nothing to see here
+                m_changed = false;
+            }
+            break;
+
+        case DEBOUNCE:
+            if (m_time - m_dbStart >= m_dbTime) {
+                m_fsm = STABLE;
+                if (pinVal != m_state) {    // a real change (else just noise)
+                    m_lastState = m_state;
+                    m_state = pinVal;
+                    m_lastChange = m_time;
+                    m_changed = true;
+                }
+            }
+            break;
     }
-    else {
-        m_lastState = m_state;
-        m_state = pinVal;
-        m_changed = (m_state != m_lastState);
-        if (m_changed) m_lastChange = ms;
-    }
-    m_time = ms;
     return m_state;
 }
