@@ -10,39 +10,46 @@ void Button::begin()
 {
     pinMode(m_pin, m_puEnable ? INPUT_PULLUP : INPUT);
     m_state = static_cast<bool>(digitalRead(m_pin)) ^ m_invert;
-    m_time = millis();
-    m_lastState = m_state;
     m_changed = false;
-    m_lastChange = m_time;
+    m_lastChange = millis();
+    m_dbStart = m_lastChange; // no debouncing
 }
 
 // returns the state of the button, true if pressed, false if released.
 // does debouncing, captures and maintains times, previous state, etc.
 bool Button::read()
 {
-    m_time = millis();
+    uint32_t now = millis();
     bool pinVal = static_cast<bool>(digitalRead(m_pin)) ^ m_invert;
 
-    switch (m_fsm) {
-        case STABLE:
-            if (pinVal != m_state) {    // maybe a change, but debounce first
-                m_dbStart = m_time;
-                m_fsm = DEBOUNCE;
-            }
-            m_changed = false;
-            break;
+    m_changed = false; // clear any previous state change
 
-        case DEBOUNCE:
-            if (m_time - m_dbStart >= m_dbTime) {
-                m_fsm = STABLE;
-                if (pinVal != m_state) {    // a real change (else just noise)
-                    m_lastState = m_state;
-                    m_state = pinVal;
-                    m_lastChange = m_time;
-                    m_changed = true;
-                }
+    if (m_dbStart != m_lastChange) {
+        // debouncing mode
+        if (pinVal != m_state) {
+            // pinVal differs - still debouncing
+            if (now - m_dbStart >= m_dbTime) {
+                // pinVal is stable for enough time => change state
+                m_state = pinVal;
+                m_changed = true;
+                m_lastChange = now;
+                m_dbStart = m_lastChange; // no debouncing
             }
-            break;
+        }
+        else {
+            // pinVal returned back to a previous state
+            m_dbStart = m_lastChange; // end debouncing
+        }
+    }
+    else {
+        // we are in a stable state mode
+        if (pinVal != m_state) {
+            // change on input => start debouncing
+            m_dbStart = now;
+        }
+        else {
+            // nothing happens
+        }
     }
     return m_state;
 }
